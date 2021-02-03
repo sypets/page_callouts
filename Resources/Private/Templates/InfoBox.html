@@ -1,0 +1,5 @@
+<f:for each="{messages}" as="message">
+	<f:be.infobox title="{message.title}" state="{message.state}">
+		<f:format.raw>{message.message}</f:format.raw>
+	</f:be.infobox>
+</f:for>

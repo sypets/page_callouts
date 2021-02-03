@@ -1,0 +1,39 @@
+{
+	"name": "sypets/page-messages",
+	"type": "typo3-cms-extension",
+	"description": "Add flash message to page module in TYPO3 backend",
+	"license": ["GPL-2.0-or-later"],
+	"authors": [
+		{
+			"name": "Sybille Peters",
+			"email": "sypets@gmx.de",
+			"rote": "Developer"
+		}
+	],
+	"config": {
+		"sort-packages": true
+	},
+	"require": {
+		"typo3/cms-core": "^9.5.0 | ^10.4.0",
+		"typo3/cms-backend": "^9.5.0 | ^10.4.0",
+		"typo3/cms-fluid": "^9.5.0 | ^10.4.0"
+	},
+	"conflict": {
+		"typo3/cms": "*"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "page_messages"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"Sypets\\PageMessages\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Sypets\\PageMessages\\Tests\\": "Tests/"
+		}
+	}
+}
