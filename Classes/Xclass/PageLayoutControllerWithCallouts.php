@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Sypets\PageMessages\Xclass;
+namespace Sypets\PageCallouts\Xclass;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -20,7 +20,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
-class PageLayoutControllerWithMessages extends PageLayoutController
+class PageLayoutControllerWithCallouts extends PageLayoutController
 {
     /**
      * Add flash message in page module via hook.
@@ -41,7 +41,7 @@ class PageLayoutControllerWithMessages extends PageLayoutController
 
         $messages = [];
         // Add messages via hooks
-        foreach($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageMessages/Xclass/PageLayoutControllerWithMessages']['addFlashMessageToPageModule'] ?? [] as $className) {
+        foreach($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
             $hook = GeneralUtility::makeInstance($className);
             $result = $hook->addMessages($pageInfo);
             if ($result && is_array($result)) {
@@ -50,7 +50,7 @@ class PageLayoutControllerWithMessages extends PageLayoutController
         }
         if ($messages) {
             $view = GeneralUtility::makeInstance(StandaloneView::class);
-            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:page_messages/Resources/Private/Templates/InfoBox.html'));
+            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:page_callouts/Resources/Private/Templates/InfoBox.html'));
             $view->assign('messages', $messages);
             $content .= $view->render();
         }

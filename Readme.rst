@@ -1,18 +1,18 @@
 Why this extension?
 ===================
 
-Informational, warning and error messages are displayed in the page module
-for various reasons, for example:
+Informational, warning and error messages are displayed as "callouts"
+in the page module for various reasons, for example:
 
 *  info message if page is of type folder
 *  warning message if there are elements with an invalid colpos
    ("unused elements")
 *  a page was defined as a shortcut, but has a missing target
 
-However, it is not easily possible for extensions to add messages of
+However, it is not easily possible for extensions to add callouts of
 their own.
 
-This extension provides a hook to add addtional messages.
+This extension provides a hook to add additional messages.
 
 How it works
 ============
@@ -35,11 +35,11 @@ ext_localconf.php:
 .. code-block::
 
     // ...
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageMessages/Xclass/PageLayoutControllerWithMessages']['addFlashMessageToPageModule'][] =
-        \Myvendor\MyExtension\Hooks\PageMessagesHook::class;
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithMessages']['addFlashMessageToPageModule'][] =
+        \Myvendor\MyExtension\Hooks\PageCalloutsHook::class;
 
 
-Classes\Hooks\PageMessagesHook.php:
+Classes\Hooks\PageCalloutsHook.php:
 
 .. code-block::
 
@@ -51,7 +51,7 @@ Classes\Hooks\PageMessagesHook.php:
    use TYPO3\CMS\Core\Utility\GeneralUtility;
    use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
-   final class PageMessagesHook
+   final class PageCalloutsHook
    {
        public function addMessages(array $pageInfo): array
        {
@@ -68,13 +68,4 @@ Classes\Hooks\PageMessagesHook.php:
            }
            return [];
        }
-
-       /**
-        * @return LanguageService
-        */
-       protected function getLanguageService()
-       {
-           return $GLOBALS['LANG'];
-       }
-
    }

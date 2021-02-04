@@ -1,7 +1,7 @@
 {
-	"name": "sypets/page-messages",
+	"name": "sypets/page-callouts",
 	"type": "typo3-cms-extension",
-	"description": "Add flash message to page module in TYPO3 backend",
+	"description": "Add callouts to page module in TYPO3 backend",
 	"license": ["GPL-2.0-or-later"],
 	"authors": [
 		{
@@ -23,17 +23,17 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "page_messages"
+			"extension-key": "page_callouts"
 		}
 	},
 	"autoload": {
 		"psr-4": {
-			"Sypets\\PageMessages\\": "Classes/"
+			"Sypets\\PageCallouts\\": "Classes/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Sypets\\PageMessages\\Tests\\": "Tests/"
+			"Sypets\\PageCallouts\\Tests\\": "Tests/"
 		}
 	}
 }
