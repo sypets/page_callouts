@@ -1,6 +1,5 @@
 <?php
 
-
 defined('TYPO3_MODE') or die();
 
 // encapsulate all locally defined variables

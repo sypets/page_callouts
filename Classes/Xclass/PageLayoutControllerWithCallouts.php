@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 namespace Sypets\PageCallouts\Xclass;
 
@@ -18,7 +19,6 @@ namespace Sypets\PageCallouts\Xclass;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Fluid\ViewHelpers\Be\InfoboxViewHelper;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
 {
@@ -39,7 +39,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
 
         $messages = [];
         // Add messages via hooks
-        foreach($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
             $hook = GeneralUtility::makeInstance($className);
             $result = $hook->addMessages($pageinfo);
             if ($result && is_array($result)) {
