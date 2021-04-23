@@ -25,25 +25,23 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
     /**
      * Add flash message in page module via hook.
      *
+     * We are using $this->pageinfo (read-only) from parent class. Property is internal
+     * so this is a bit ugly - but no better alternative, at the moment.
+     *
      * @return string
      */
     protected function getHeaderFlashMessagesForCurrentPid(): string
     {
         $content = parent::getHeaderFlashMessagesForCurrentPid();
-        $pageInfo = [
-            'uid' => $this->pageinfo['uid'],
-            'title' => $this->pageinfo['title'],
-            'lang' =>  $this->pageinfo['sys_language_uid'],
-            't3_origuid' =>  $this->pageinfo['t3_origuid'],
-            'hidden' =>  $this->pageinfo['hidden'],
-            'doktype' =>  $this->pageinfo['doktype'],
-        ];
+        // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
+        $pageinfo = $this->pageinfo;
+        $pageinfo['lang'] = $pageinfo['sys_language_uid'];
 
         $messages = [];
         // Add messages via hooks
         foreach($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
             $hook = GeneralUtility::makeInstance($className);
-            $result = $hook->addMessages($pageInfo);
+            $result = $hook->addMessages($pageinfo);
             if ($result && is_array($result)) {
                 $messages[] = $result;
             }

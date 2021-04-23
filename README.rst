@@ -56,6 +56,7 @@ Classes\Hooks\PageCalloutsHook.php:
        public function addMessages(array $pageInfo): array
        {
            $pageId = (int) ($pageInfo['uid']);
+           $doktype = (int) ($pageInfo['doktype'] ?? 0);
 
            if ($someCondition) {
                $title = 'Some title';
