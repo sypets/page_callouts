@@ -3,6 +3,12 @@
 	"type": "typo3-cms-extension",
 	"description": "Add callouts to page module in TYPO3 backend",
 	"license": ["GPL-2.0-or-later"],
+	"keywords": [
+		"TYPO3",
+		"TYPO3 extension",
+		"TYPO3 backend",
+		"backend"
+	],
 	"authors": [
 		{
 			"name": "Sybille Peters",
