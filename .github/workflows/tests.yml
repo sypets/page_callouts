@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php: [ '7.3', '7.4' ]
+        php: [ '7.4' ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
 
       - name: cgl
-        run: Build/Scripts/runTests.sh -s cgl -v -n
+        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
 
       - name: Lint PHP
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
