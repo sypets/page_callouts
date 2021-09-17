@@ -58,6 +58,15 @@
 	"scripts": {
 		"post-autoload-dump": [
 			"TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+		],
+		"cgl:check:php": [
+			"Build/Scripts/runTests.sh -p 7.4 -s cgl -v -n"
+		],
+		"cgl:fix:php": [
+			"Build/Scripts/runTests.sh -p 7.4 -s cgl -v"
+		],
+		"lint:php": [
+			"Build/Scripts/runTests.sh -p 7.4 -s lint"
 		]
 	}
 }
