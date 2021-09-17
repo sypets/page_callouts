@@ -262,7 +262,7 @@ case ${TEST_SUITE} in
     cgl)
         # Active dry-run for cglAll needs not "-n" but specific options
         if [[ ! -z ${CGLCHECK_DRY_RUN} ]]; then
-            CGLCHECK_DRY_RUN="--dry-run --diff --diff-format udiff"
+            CGLCHECK_DRY_RUN="--dry-run --diff"
         fi
         setUpDockerComposeDotEnv
         docker-compose run cgl_all
