@@ -19,21 +19,18 @@
 	"config": {
 		"sort-packages": true,
 		"vendor-dir": ".Build/vendor",
-		"bin-dir": ".Build/bin",
-		"platform": {
-			"php": "7.3.0"
-		}
+		"bin-dir": ".Build/bin"
 	},
 	"require": {
-		"typo3/cms-core": "^10.4.0 || ^11.4.0",
-		"typo3/cms-backend": "^10.4.0 || ^11.4.0",
-		"typo3/cms-fluid": "^10.4.0 || ^11.4.0"
+		"typo3/cms-core": "^10.4.14 || 11.3.2",
+		"typo3/cms-backend": "^10.4.14 || 11.3.2",
+		"typo3/cms-fluid": "^10.4.14 || 11.3.2"
 	},
 	"require-dev": {
 		"php": "^7.3 || ^7.4",
-		"friendsofphp/php-cs-fixer": "^2.17.3",
-		"phpunit/phpunit": "^8",
-		"typo3/testing-framework": "^6.7.1"
+		"friendsofphp/php-cs-fixer": "^2.18.6",
+		"phpunit/phpunit": "^8.5.21",
+		"typo3/testing-framework": "^6.14.0"
 	},
 	"conflict": {
 		"typo3/cms": "*"
