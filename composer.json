@@ -22,9 +22,9 @@
 		"bin-dir": ".Build/bin"
 	},
 	"require": {
-		"typo3/cms-core": "^10.4.14 || 11.3.2",
-		"typo3/cms-backend": "^10.4.14 || 11.3.2",
-		"typo3/cms-fluid": "^10.4.14 || 11.3.2"
+		"typo3/cms-core": "^10.4.14 || ^11.5.3",
+		"typo3/cms-backend": "^10.4.14 || ^11.5.3",
+		"typo3/cms-fluid": "^10.4.14 || ^11.5.3"
 	},
 	"require-dev": {
 		"php": "^7.3 || ^7.4",
