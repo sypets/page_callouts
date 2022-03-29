@@ -38,11 +38,11 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         //Initialize UserTs data
         $userTS = $this->getBackendUser()->getTSConfig()['page.']['mod.'];
 
-        if(isset($userTS['page_callouts.'])){
+        if (isset($userTS['page_callouts.'])) {
             $this->showInfoBox = (int)$userTS['page_callouts.']['showInfoBox'];
         }
 
-        if($this->showInfoBox == 1){
+        if ($this->showInfoBox == 1) {
             // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
             $pageinfo = $this->pageinfo;
             $pageinfo['lang'] = $pageinfo['sys_language_uid'];
