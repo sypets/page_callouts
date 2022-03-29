@@ -17,11 +17,13 @@ namespace Sypets\PageCallouts\Xclass;
  */
 
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
 {
+    protected int $showInfoBox = 1;
     /**
      * Add flash message in page module via hook.
      *
@@ -33,26 +35,42 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
     protected function getHeaderFlashMessagesForCurrentPid(): string
     {
         $content = parent::getHeaderFlashMessagesForCurrentPid();
-        // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
-        $pageinfo = $this->pageinfo;
-        $pageinfo['lang'] = $pageinfo['sys_language_uid'];
+        //Initialize UserTs data
+        $userTS = $this->getBackendUser()->getTSConfig()['page.']['mod.'];
 
-        $messages = [];
-        // Add messages via hooks
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
-            $hook = GeneralUtility::makeInstance($className);
-            $result = $hook->addMessages($pageinfo);
-            if ($result && is_array($result)) {
-                $messages[] = $result;
+        if(isset($userTS['page_callouts.'])){
+            $this->showInfoBox = (int)$userTS['page_callouts.']['showInfoBox'];
+        }
+
+        if($this->showInfoBox == 1){
+            // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
+            $pageinfo = $this->pageinfo;
+            $pageinfo['lang'] = $pageinfo['sys_language_uid'];
+
+            $messages = [];
+            // Add messages via hooks
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
+                $hook = GeneralUtility::makeInstance($className);
+                $result = $hook->addMessages($pageinfo);
+                if ($result && is_array($result)) {
+                    $messages[] = $result;
+                }
+            }
+            if ($messages) {
+                $view = GeneralUtility::makeInstance(StandaloneView::class);
+                $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:page_callouts/Resources/Private/Templates/InfoBox.html'));
+                $view->assign('messages', $messages);
+                $content .= $view->render();
             }
         }
-        if ($messages) {
-            $view = GeneralUtility::makeInstance(StandaloneView::class);
-            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:page_callouts/Resources/Private/Templates/InfoBox.html'));
-            $view->assign('messages', $messages);
-            $content .= $view->render();
-        }
-
         return $content;
+    }
+
+    /**
+     * @return BackendUserAuthentication
+     */
+    protected function getBackendUser(): BackendUserAuthentication
+    {
+        return $GLOBALS['BE_USER'];
     }
 }
