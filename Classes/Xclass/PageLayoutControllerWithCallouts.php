@@ -23,7 +23,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
 {
-    protected int $showInfoBox = 1;
+    protected int $showInfoBox;
     /**
      * Add flash message in page module via hook.
      *
@@ -37,7 +37,6 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         $content = parent::getHeaderFlashMessagesForCurrentPid();
         //Initialize UserTs data
         $userTS = $this->getBackendUser()->getTSConfig()['page.']['mod.'];
-
         if (isset($userTS['page_callouts.'])) {
             $this->showInfoBox = (int)$userTS['page_callouts.']['showInfoBox'];
         }
