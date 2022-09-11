@@ -30,9 +30,9 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
      *
      * @return string
      */
-    protected function getHeaderFlashMessagesForCurrentPid(): string
+    protected function generateMessagesForCurrentPage(): string
     {
-        $content = parent::getHeaderFlashMessagesForCurrentPid();
+        $content = parent::generateMessagesForCurrentPage();
         // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
         $pageinfo = $this->pageinfo;
         $pageinfo['lang'] = $pageinfo['sys_language_uid'];
