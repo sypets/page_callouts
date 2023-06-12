@@ -1,8 +1,6 @@
-# Configuration for running GitHub actions
-#  based on EXT:enetcache: .github/workflows/tests.yml
-#    https://github.com/lolli42/enetcache/blob/master/.github/workflows/tests.yml
-#  see https://docs.github.com/en/actions/guides/setting-up-continuous-integration-using-workflow-templates
-
+# CI tests (multiple versions)
+# - run with min / max TYPO3 version and several PHP versions
+# - todo: activate and add phpstan and tests
 name: CI
 
 on:
@@ -12,11 +10,11 @@ on:
 jobs:
 
   testsuite:
-    name: all tests
+    name: CI (multiple versions)
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php: [ '7.3', '7.4' ]
+        php: [ '7.4', '8.0', '8.1', '8.2'  ]
         minMax: [ 'composerInstallMin', 'composerInstallMax' ]
     steps:
       - name: Checkout
@@ -25,14 +23,9 @@ jobs:
       - name: Composer
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
 
-      - name: Composer validate
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
+#      - name: phpstan
+#        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
 
-      - name: cgl
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
-
-      - name: Lint PHP
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
 
 #      - name: Unit tests
 #        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit
