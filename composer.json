@@ -26,14 +26,14 @@
 		}
 	},
 	"require": {
-		"typo3/cms-core": "^11.5.15",
-		"typo3/cms-backend": "^11.5.15",
-		"typo3/cms-fluid": "^11.5.15"
+		"php": "~7.4 || ~8.0 || ~8.1 || ~8.2",
+		"typo3/cms-core": "^11.5.27",
+		"typo3/cms-backend": "^11.5.27",
+		"typo3/cms-fluid": "^11.5.27"
 	},
 	"require-dev": {
-		"friendsofphp/php-cs-fixer": "^2.18.6",
-		"phpunit/phpunit": "^8.5.21",
-		"typo3/testing-framework": "^6.14.0"
+		"friendsofphp/php-cs-fixer": "^3.14",
+		"typo3/testing-framework": "^7"
 	},
 	"conflict": {
 		"typo3/cms": "*"
