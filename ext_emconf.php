@@ -18,7 +18,9 @@ $EM_CONF[$_EXTKEY] = [
             'backend' => '11.5.27-11.5.99',
             'fluid' => '11.5.27-11.5.99',
         ],
-        'conflicts' => [],
+        'conflicts' => [
+            'qc_be_pagelanguage' => '1.0.0-9.9.99'
+        ],
         'suggests' => [],
     ],
 ];
