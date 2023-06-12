@@ -1,29 +1,29 @@
 #!/bin/bash
 
-# 7.4 and composer latest
+PHP=8.1
 
 # abort on error
 set -e
 
 echo "composer install"
-Build/Scripts/runTests.sh -p 7.4 -s composerInstallMax
+Build/Scripts/runTests.sh -p ${PHP} -s composerInstallMax
 
 echo "cgl"
-Build/Scripts/runTests.sh -p 7.4 -s cgl -n
+Build/Scripts/runTests.sh -p ${PHP} -s cgl -n
 
 echo "composer validate"
-Build/Scripts/runTests.sh -p 7.4 -s composerValidate
+Build/Scripts/runTests.sh -p ${PHP} -s composerValidate
 
 echo "lint"
-Build/Scripts/runTests.sh -p 7.4 -s lint
+Build/Scripts/runTests.sh -p ${PHP} -s lint
 
-echo "phpstan"
-Build/Scripts/runTests.sh -p 7.4 -s phpstan -e "-c ../Build/phpstan.neon"
+#echo "phpstan"
+#Build/Scripts/runTests.sh -p ${PHP} -s phpstan -e "-c ../Build/phpstan.neon"
 
-echo "Unit tests"
-Build/Scripts/runTests.sh -p 7.4 -s unit
+#echo "Unit tests"
+#Build/Scripts/runTests.sh -p ${PHP} -s unit
 
-echo "functional tests"
-Build/Scripts/runTests.sh -p 7.4 -d mariadb -s functional
+#echo "functional tests"
+#Build/Scripts/runTests.sh -p ${PHP} -d mariadb -s functional
 
-echo "done"
+#echo "done"

@@ -7,6 +7,8 @@
 # TYPO3 core test runner based on docker and docker-compose.
 #
 
+PHP_VERSION="8.1"
+
 # Function to write a .env file in Build/testing-docker/local
 # This is read by docker-compose and vars defined here are
 # used in Build/testing-docker/local/docker-compose.yml
@@ -54,7 +56,7 @@ a recent docker-compose (tested >=1.21.2) is needed.
 
 Usage: $0 [options] [file]
 
-No arguments: Run all unit tests with PHP 7.2
+No arguments: Run all unit tests with default PHP
 
 Options:
     -s <...>
@@ -78,13 +80,12 @@ Options:
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <7.2|7.3|7.4|8.0|8.1>
+    -p <7.4|8.0|8.1|8.2>
         Specifies the PHP minor version to be used
-            - 7.2 (default): use PHP 7.2
-            - 7.3: use PHP 7.3
             - 7.4: use PHP 7.4
             - 8.0: use PHP 8.0
             - 8.1: use PHP 8.1
+            - 8.2: (default) use PHP 8.2
 
     -e "<phpunit options>"
         Only with -s functional|unit|phpstan
@@ -120,17 +121,17 @@ Options:
         Show this help.
 
 Examples:
-    # Run unit tests using PHP 7.2
+    # Run unit tests using default PHP version
     ./Build/Scripts/runTests.sh
 
-    # Run unit tests using PHP 7.3
-    ./Build/Scripts/runTests.sh -p 7.3
+    # Run unit tests using PHP 8.2
+    ./Build/Scripts/runTests.sh -p 8.2
 
-    # Run functional tests using PHP 7.4 and sqlite
-    ./Build/Scripts/runTests.sh -s functional -p 7.4 -d sqlite
+    # Run functional tests using PHP 8.2 and sqlite
+    ./Build/Scripts/runTests.sh -s functional -p 8.2 -d sqlite
 
     # Run functional tests in phpunit with a filtered test method name in a specified file, php 7.4 and xdebug enabled.
-    ./Build/Scripts/runTests.sh -s functional -p 7.4 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
+    ./Build/Scripts/runTests.sh -s functional -p 8.2 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
 # Test if docker-compose exists, else exit out with error
@@ -152,7 +153,6 @@ CORE_ROOT="${PWD}/../../"
 ROOT_DIR=`readlink -f ${PWD}/../../`
 TEST_SUITE="unit"
 DBMS="mariadb"
-PHP_VERSION="7.4"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
@@ -176,7 +176,7 @@ while getopts ":s:d:p:e:xy:huvn" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(7.2|7.3|7.4|8.0|8.1)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(7.4|8.0|8.1|8.2)$ ]]; then
                 INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
             fi
             ;;
@@ -273,7 +273,7 @@ case ${TEST_SUITE} in
     cgl)
         # Active dry-run for cglAll needs not "-n" but specific options
         if [[ ! -z ${CGLCHECK_DRY_RUN} ]]; then
-            CGLCHECK_DRY_RUN="--dry-run --diff --diff-format udiff"
+            CGLCHECK_DRY_RUN="--dry-run --diff"
         fi
         setUpDockerComposeDotEnv
         docker-compose run cgl_all
