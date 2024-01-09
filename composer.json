@@ -36,7 +36,7 @@
 		"typo3/testing-framework": "@dev"
 	},
 	"conflict": {
-		"qc/qc-be-pagelanguage": "<3.0.0"
+		"qc/qc-be-pagelanguage": "<1.0.2"
 	},
 	"extra": {
 		"typo3/cms": {
