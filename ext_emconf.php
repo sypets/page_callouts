@@ -8,12 +8,12 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'sypets@gmx.de',
     'author_company' => '',
     'state' => 'stable',
-    'version' => '3.0.3-dev',
+    'version' => '4.0.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '11.5.30-11.5.99',
-            'backend' => '11.5.30-11.5.99',
-            'fluid' => '11.5.30-11.5.99',
+            'typo3' => '11.5.30-12.4.99',
+            'backend' => '11.5.30-12.4.99',
+            'fluid' => '11.5.30-12.4.99',
         ],
         'conflicts' => [
             'qc_be_pagelanguage' => '1.0.0-9.9.99'

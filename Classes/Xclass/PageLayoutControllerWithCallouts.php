@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Sypets\PageCallouts\Xclass;
 
 /*
@@ -15,11 +16,9 @@ namespace Sypets\PageCallouts\Xclass;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
 {
@@ -36,8 +35,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
     {
         $content = parent::generateMessagesForCurrentPage($request);
         // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
-        $pageinfo = $this->pageinfo;
-        $pageinfo['lang'] = $pageinfo['sys_language_uid'];
+        $this->pageinfo['lang'] = $this->pageinfo['sys_language_uid'];
 
         $messages = [];
         // Add messages via hooks
@@ -51,7 +49,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         )
         {
             $hook = GeneralUtility::makeInstance($className);
-            $result = $hook->addMessages($pageinfo);
+            $result = $hook->addMessages($this->pageinfo);
             if ($result && is_array($result)) {
                 $messages[] = $result;
             }
