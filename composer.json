@@ -31,8 +31,8 @@
 		"typo3/cms-fluid": "^12.4"
 	},
 	"require-dev": {
-		"friendsofphp/php-cs-fixer": "@dev",
-		"typo3/testing-framework": "@dev"
+		"friendsofphp/php-cs-fixer": "^3.0",
+		"typo3/testing-framework": "^7.0.4"
 	},
 	"conflict": {
 		"qc/qc-be-pagelanguage": "<1.0.2"
