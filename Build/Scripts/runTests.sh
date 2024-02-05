@@ -7,7 +7,7 @@
 # TYPO3 core test runner based on docker and docker-compose.
 #
 
-PHP_VERSION="8.1"
+PHP_VERSION="8.3"
 
 # Function to write a .env file in Build/testing-docker/local
 # This is read by docker-compose and vars defined here are
@@ -80,12 +80,11 @@ Options:
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <7.4|8.0|8.1|8.2>
+    -p <8.1|8.2|8.3>
         Specifies the PHP minor version to be used
-            - 7.4: use PHP 7.4
-            - 8.0: use PHP 8.0
             - 8.1: use PHP 8.1
-            - 8.2: (default) use PHP 8.2
+            - 8.2: use PHP 8.2
+            - 8.3: (default) use PHP 8.3
 
     -e "<phpunit options>"
         Only with -s functional|unit|phpstan
@@ -176,7 +175,7 @@ while getopts ":s:d:p:e:xy:huvn" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(7.4|8.0|8.1|8.2)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(8.1|8.2|8.3)$ ]]; then
                 INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
             fi
             ;;
@@ -222,7 +221,6 @@ if [ ${#INVALID_OPTIONS[@]} -ne 0 ]; then
     exit 1
 fi
 
-# Move "7.2" to "php72", the latter is the docker container name
 DOCKER_PHP_IMAGE=`echo "php${PHP_VERSION}" | sed -e 's/\.//'`
 
 # Set $1 to first mass argument, this is the optional test file or test directory to execute

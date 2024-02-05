@@ -1,5 +1,5 @@
-# statics checks
-# - run only with latest TYPO3 and PHP version
+# unit / functional tests
+# - run with more PHP versions
 name: CI
 
 on:
@@ -8,14 +8,12 @@ on:
 
 jobs:
 
-  testsuite_ci_static:
+  testsuite_ci:
     name: CI static
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        # run static checks only with latest PHP version (for supported TYPO3 versions)
-        php: [ '8.1' ]
-        # run static checks only with latest TYPO3 version
+        php: [ '8.1', '8.2', '8.3' ]
         minMax: [ 'composerInstallMax' ]
     steps:
       - name: Checkout
@@ -23,15 +21,6 @@ jobs:
 
       - name: Composer
         run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s ${{ matrix.minMax }}
-
-      - name: Composer validate
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s composerValidate
-
-      - name: cgl
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s cgl -v -n
-
-      - name: Lint PHP
-        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s lint
 
 #      - name: Unit tests
 #        run: Build/Scripts/runTests.sh -p ${{ matrix.php }} -s unit

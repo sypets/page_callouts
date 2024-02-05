@@ -46,8 +46,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
                 ['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']
                 ['addFlashMessageToPageModule'] ?? []
              as $className
-        )
-        {
+        ) {
             $hook = GeneralUtility::makeInstance($className);
             $result = $hook->addMessages($this->pageinfo);
             if ($result && is_array($result)) {
