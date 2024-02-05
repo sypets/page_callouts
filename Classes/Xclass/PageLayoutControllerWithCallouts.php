@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Sypets\PageCallouts\Xclass;
 
 /*
@@ -15,10 +16,9 @@ namespace Sypets\PageCallouts\Xclass;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
 {
@@ -28,31 +28,31 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
      * We are using $this->pageinfo (read-only) from parent class. Property is internal
      * so this is a bit ugly - but no better alternative, at the moment.
      *
+     * @param ServerRequestInterface $request
      * @return string
      */
-    protected function generateMessagesForCurrentPage(): string
+    protected function generateMessagesForCurrentPage(ServerRequestInterface $request): array
     {
-        $content = parent::generateMessagesForCurrentPage();
+        $content = parent::generateMessagesForCurrentPage($request);
         // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
-        $pageinfo = $this->pageinfo;
-        $pageinfo['lang'] = $pageinfo['sys_language_uid'];
+        $this->pageinfo['lang'] = $this->pageinfo['sys_language_uid'];
 
         $messages = [];
         // Add messages via hooks
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']['addFlashMessageToPageModule'] ?? [] as $className) {
+        foreach (
+            $GLOBALS
+                ['TYPO3_CONF_VARS']
+                ['SC_OPTIONS']
+                ['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']
+                ['addFlashMessageToPageModule'] ?? []
+             as $className
+        ) {
             $hook = GeneralUtility::makeInstance($className);
-            $result = $hook->addMessages($pageinfo);
+            $result = $hook->addMessages($this->pageinfo);
             if ($result && is_array($result)) {
                 $messages[] = $result;
             }
         }
-        if ($messages) {
-            $view = GeneralUtility::makeInstance(StandaloneView::class);
-            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:page_callouts/Resources/Private/Templates/InfoBox.html'));
-            $view->assign('messages', $messages);
-            $content .= $view->render();
-        }
-
-        return $content;
+        return $messages;
     }
 }
