@@ -36,8 +36,6 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         $content = parent::generateMessagesForCurrentPage($request);
         // added for compatibility with older versions, should use only $this->pageinfo['sys_language_uid'] in future
         $this->pageinfo['lang'] = $this->pageinfo['sys_language_uid'];
-
-        $messages = [];
         // Add messages via hooks
         foreach (
             $GLOBALS
@@ -49,10 +47,10 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         ) {
             $hook = GeneralUtility::makeInstance($className);
             $result = $hook->addMessages($this->pageinfo);
-            if ($result && is_array($result)) {
-                $messages[] = $result;
+            if (is_array($result) && !empty($result)) {
+                $content[] = $result;
             }
         }
-        return $messages;
+        return $content;
     }
 }
