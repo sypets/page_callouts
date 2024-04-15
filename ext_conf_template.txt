@@ -1,0 +1,6 @@
+### separate label and description with ":"
+### Things added in later versions, add at the bottom
+
+# cat=enable; type=bool; label=Enable close button in page module if returnUrl is set
+enableCloseButtonInPageModule = 1
+
