@@ -1,18 +1,9 @@
-Why this extension?
-===================
+.. include:: /Includes.rst.txt
 
-Informational, warning and error messages are displayed as "callouts"
-in the page module for various reasons, for example:
 
-*  info message if page is of type folder
-*  warning message if there are elements with an invalid colpos
-   ("unused elements")
-*  a page was defined as a shortcut, but has a missing target
-
-However, it is not easily possible for extensions to add callouts of
-their own.
-
-This extension provides a hook to add additional messages.
+==============
+For Developers
+==============
 
 How it works
 ============
