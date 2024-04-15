@@ -16,7 +16,11 @@ namespace Sypets\PageCallouts\Xclass;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
+use TYPO3\CMS\Backend\Template\Components\ButtonBar;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -54,5 +58,42 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         }
 
         return $content;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     */
+    protected function makeButtons(ServerRequestInterface $request): void
+    {
+        parent::makeButtons($request);
+
+        $returnUrl = $request->getQueryParams()['returnUrl'] ?? '';
+        if (!$returnUrl) {
+            return;
+        }
+
+        // check if enabled in Extension Configuration
+        if (!$this->getExtensionConfigurationTypeBool('enableCloseButtonInPageModule', true)) {
+            return;
+        }
+
+        $returnButton = $this->buttonBar->makeLinkButton()
+            ->setHref($returnUrl)
+            ->setTitle($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.close') ?: 'Close')
+            // Create your custom icon or use any of the alredy created icons
+            ->setIcon($this->iconFactory->getIcon('actions-close', Icon::SIZE_SMALL))
+            ->setShowLabelText(true);
+        // should use BUTTON_POSITION_RIGHT, but does not work?
+        $this->buttonBar->addButton($returnButton, ButtonBar::BUTTON_POSITION_LEFT, 0);
+    }
+
+    protected function getExtensionConfigurationTypeBool(string $setting, bool $defaultValue): bool
+    {
+        /** @var array<string,mixed> $extConf */
+        $extConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('page_callouts');
+        if (isset($extConf[$setting])) {
+            return (bool)$extConf[$setting];
+        }
+        return $defaultValue;
     }
 }
