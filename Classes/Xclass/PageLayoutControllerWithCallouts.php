@@ -57,38 +57,38 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         }
         return $content;
     }
-/*
-    protected function makeButtons(ModuleTemplate $view, ServerRequestInterface $request, array $tsConfig): void
-    {
-        parent::makeButtons($request);
+    /*
+        protected function makeButtons(ModuleTemplate $view, ServerRequestInterface $request, array $tsConfig): void
+        {
+            parent::makeButtons($request);
 
-        $returnUrl = $request->getQueryParams()['returnUrl'] ?? '';
-        if (!$returnUrl) {
-            return;
+            $returnUrl = $request->getQueryParams()['returnUrl'] ?? '';
+            if (!$returnUrl) {
+                return;
+            }
+
+            // check if enabled in Extension Configuration
+            if (!$this->getExtensionConfigurationTypeBool('enableCloseButtonInPageModule', true)) {
+                return;
+            }
+
+            $returnButton = $this->buttonBar->makeLinkButton()
+                ->setHref($returnUrl)
+                ->setTitle($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.close') ?: 'Close')
+                // Create your custom icon or use any of the alredy created icons
+                ->setIcon($this->iconFactory->getIcon('actions-close', Icon::SIZE_SMALL))
+                ->setShowLabelText(true);
+            // should use BUTTON_POSITION_RIGHT, but does not work?
+            $this->buttonBar->addButton($returnButton, ButtonBar::BUTTON_POSITION_LEFT, 0);
         }
 
-        // check if enabled in Extension Configuration
-        if (!$this->getExtensionConfigurationTypeBool('enableCloseButtonInPageModule', true)) {
-            return;
+        protected function getExtensionConfigurationTypeBool(string $setting, bool $defaultValue): bool
+        {
+            $extConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('page_callouts');
+            if (isset($extConf[$setting])) {
+                return (bool)$extConf[$setting];
+            }
+            return $defaultValue;
         }
-
-        $returnButton = $this->buttonBar->makeLinkButton()
-            ->setHref($returnUrl)
-            ->setTitle($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.close') ?: 'Close')
-            // Create your custom icon or use any of the alredy created icons
-            ->setIcon($this->iconFactory->getIcon('actions-close', Icon::SIZE_SMALL))
-            ->setShowLabelText(true);
-        // should use BUTTON_POSITION_RIGHT, but does not work?
-        $this->buttonBar->addButton($returnButton, ButtonBar::BUTTON_POSITION_LEFT, 0);
-    }
-
-    protected function getExtensionConfigurationTypeBool(string $setting, bool $defaultValue): bool
-    {
-        $extConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('page_callouts');
-        if (isset($extConf[$setting])) {
-            return (bool)$extConf[$setting];
-        }
-        return $defaultValue;
-    }
-*/
+    */
 }
