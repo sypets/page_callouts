@@ -19,6 +19,7 @@ namespace Sypets\PageCallouts\Xclass;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -71,6 +72,11 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
             return;
         }
 
+        // check if enabled in Extension Configuration
+        if (!$this->getExtensionConfigurationTypeBool('enableCloseButtonInPageModule', true)) {
+            return;
+        }
+
         $returnButton = $this->buttonBar->makeLinkButton()
             ->setHref($returnUrl)
             ->setTitle($this->getLanguageService()->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.close') ?: 'Close')
@@ -79,5 +85,15 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
             ->setShowLabelText(true);
         // should use BUTTON_POSITION_RIGHT, but does not work?
         $this->buttonBar->addButton($returnButton, ButtonBar::BUTTON_POSITION_LEFT, 0);
+    }
+
+    protected function getExtensionConfigurationTypeBool(string $setting, bool $defaultValue): bool
+    {
+        /** @var array<string,mixed> $extConf */
+        $extConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('page_callouts');
+        if (isset($extConf[$setting])) {
+            return (bool) $extConf[$setting];
+        }
+        return $defaultValue;
     }
 }
