@@ -92,7 +92,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         /** @var array<string,mixed> $extConf */
         $extConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('page_callouts');
         if (isset($extConf[$setting])) {
-            return (bool) $extConf[$setting];
+            return (bool)$extConf[$setting];
         }
         return $defaultValue;
     }
