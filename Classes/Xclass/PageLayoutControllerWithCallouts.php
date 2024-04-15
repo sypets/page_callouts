@@ -20,7 +20,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -60,13 +59,8 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
         return $content;
     }
 
-
     /**
      * @param ServerRequestInterface $request
-     * @return void
-     *
-     * credit: based on Stack Overflow answer https://stackoverflow.com/a/78319234/2444812
-     * by Mogens https://stackoverflow.com/users/5023204/mogens
      */
     protected function makeButtons(ServerRequestInterface $request): void
     {
