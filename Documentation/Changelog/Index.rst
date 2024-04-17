@@ -21,4 +21,4 @@ Changelog
    :glob:
    :titlesonly:
 
-   Entries/4.x/*
+   Entries/3.x/*
