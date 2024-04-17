@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Sypets\PageCallouts\:
+    resource: '../Classes/*'
+
+  # event listener
+  Sypets\PageCallouts\EventListener\PageLayoutListener:
+    tags:
+      - name: event.listener
+        identifier: page_callouts/page-layout-listener
