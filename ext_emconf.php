@@ -19,7 +19,7 @@ $EM_CONF[$_EXTKEY] = [
             'fluid' => '11.5.30-11.5.99',
         ],
         'conflicts' => [
-            'qc_be_pagelanguage' => '1.0.0-9.9.99'
+            'qc_be_pagelanguage' => '1.0.0-1.0.1'
         ],
         'suggests' => [],
     ],
