@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file t3:id="1415814894" source-language="en" datatype="plaintext" original="EXT:page_callouts/Resources/Private/Language/locallang.xlf"
+		  date="2024-05-05T20:22:34Z" product-name="page_callouts">
+		<header/>
+		<body>
+			<trans-unit id="enableCloseButtonInPageModule" resname="enableCloseButtonInPageModule">
+				<source>Enable close button in page module if returnUrl is set</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
