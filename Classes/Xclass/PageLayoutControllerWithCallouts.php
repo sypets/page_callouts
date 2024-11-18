@@ -18,10 +18,6 @@ namespace Sypets\PageCallouts\Xclass;
  */
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\PageLayoutController;
-use TYPO3\CMS\Backend\Template\Components\ButtonBar;
-use TYPO3\CMS\Backend\Template\ModuleTemplate;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class PageLayoutControllerWithCallouts extends PageLayoutController
@@ -46,8 +42,7 @@ class PageLayoutControllerWithCallouts extends PageLayoutController
                 ['TYPO3_CONF_VARS']
                 ['SC_OPTIONS']
                 ['Sypets/PageCallouts/Xclass/PageLayoutControllerWithCallouts']
-                ['addFlashMessageToPageModule'] ?? []
-             as $className
+                ['addFlashMessageToPageModule'] ?? [] as $className
         ) {
             $hook = GeneralUtility::makeInstance($className);
             $result = $hook->addMessages($this->pageinfo);
