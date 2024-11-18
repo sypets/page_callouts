@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-# copied from EXT:enetcache:
-#  https://github.com/lolli42/enetcache/blob/master/Build/Scripts/runTests.sh
+# loosely based on Build/Script files in TYPO3 core
 
-#
-# TYPO3 core test runner based on docker and docker-compose.
-#
 
-PHP_VERSION="8.3"
+# config
+SUPPORTED_PHP_VERSIONS="8.1|8.2|8.3|8.4"
+DEFAULT_PHP_VERSION="8.4"
+PHP_VERSION="${DEFAULT_PHP_VERSION}"
+DEFAULT_PHP_PLATFORM_VERSION="8.4.0"
+
 
 # Function to write a .env file in Build/testing-docker/local
 # This is read by docker-compose and vars defined here are
@@ -29,7 +30,7 @@ setUpDockerComposeDotEnv() {
         echo "HOST_HOME=${HOME}"
 
         # Your local user
-        echo "CORE_ROOT=${CORE_ROOT}"
+        echo "CORE_VERSION=${CORE_VERSION}"
         echo "ROOT_DIR=${ROOT_DIR}"
         echo "HOST_USER=${USER}"
         echo "TEST_FILE=${TEST_FILE}"
@@ -37,10 +38,19 @@ setUpDockerComposeDotEnv() {
         echo "PHP_XDEBUG_ON=${PHP_XDEBUG_ON}"
         echo "PHP_XDEBUG_PORT=${PHP_XDEBUG_PORT}"
         echo "PHP_VERSION=${PHP_VERSION}"
+        echo "DEFAULT_PHP_VERSION"=${DEFAULT_PHP_VERSION}
+        echo "DEFAULT_PHP_PLATFORM_VERSION"=${DEFAULT_PHP_PLATFORM_VERSION}
+        echo "PHP_PLATFORM_VERSION"=${PHP_PLATFORM_VERSION}
+        echo "MARIADB_VERSION=${MARIADB_VERSION}"
+        echo "MYSQL_VERSION=${MYSQL_VERSION}"
+        echo "POSTGRES_VERSION=${POSTGRES_VERSION}"
         echo "DOCKER_PHP_IMAGE=${DOCKER_PHP_IMAGE}"
         echo "EXTRA_TEST_OPTIONS=${EXTRA_TEST_OPTIONS}"
         echo "SCRIPT_VERBOSE=${SCRIPT_VERBOSE}"
         echo "PASSWD_PATH=${PASSWD_PATH}"
+        echo "IMAGE_PREFIX=${IMAGE_PREFIX}"
+        echo "DOCKER_COMPOSE_COMMAND=${DOCKER_COMPOSE_COMMAND}"
+
     } > .env
 }
 
@@ -51,12 +61,9 @@ a docker based test environment. Handles execution of single test files, sending
 xdebug information to a local IDE and more.
 Also used by github actions for test execution.
 
-Recommended docker version is >=20.10 for xdebug break pointing to work reliably, and
-a recent docker-compose (tested >=1.21.2) is needed.
-
 Usage: $0 [options] [file]
 
-No arguments: Run all unit tests with default PHP
+No arguments: Run all unit tests with default PHP version
 
 Options:
     -s <...>
@@ -65,28 +72,35 @@ Options:
             - composerInstallMax: "composer update", with no platform.php config.
             - composerInstallMin: "composer update --prefer-lowest", with platform.php set to PHP version x.x.0.
             - composerValidate: "composer validate"
+            - composerCoreVersion: "composer require --no-install typo3/minimal:"coreVersion"
+            - cgl: test and fix all core php files
             - cglGit: test and fix latest committed patch for CGL compliance
-            - cglAll: test and fix all core php files
             - lint: PHP linting
             - phpstan: phpstan tests
+            - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - unit (default): PHP unit tests
             - functional: functional tests
 
-    -d <mariadb|mssql|postgres|sqlite>
+    -t <composer-core-version-constraint>
+        Only with -s composerCoreVersion
+        Specifies the Typo3 core version to be used
+            - '^11.5' (default)
+            - ...
+
+    -d <mariadb|mysql|postgres|sqlite>
         Only with -s functional
         Specifies on which DBMS tests are performed
             - mariadb (default): use mariadb
-            - mssql: use mssql microsoft sql server
+            - mysql: MySQL (currently untested)
             - postgres: use postgres
             - sqlite: use sqlite
 
-    -p <8.1|8.2|8.3>
+    -p <8.1|8.2>
         Specifies the PHP minor version to be used
             - 8.1: use PHP 8.1
-            - 8.2: use PHP 8.2
-            - 8.3: (default) use PHP 8.3
+            - 8.2 (default)
 
-    -e "<phpunit options>"
+    -e "<phpunit|phpstan options>"
         Only with -s functional|unit|phpstan
         Additional options to send to phpunit tests.
         For phpunit, options starting with "--" must be added after options starting with "-".
@@ -104,14 +118,14 @@ Options:
         is not listening on default port.
 
     -n
-        Only with -s cglGit|cglAll
+        Only with -s cgl|cglGit
         Activate dry-run in CGL check that does not actively change files and only prints broken ones.
 
     -u
-        Update existing typo3gmbh/phpXY:latest docker images. Maintenance call to docker pull latest
+        Update existing ${TYPO3_DOCKER_IMAGE_BASE}XY:latest docker images. Maintenance call to docker pull latest
         versions of the main php images. The images are updated once in a while and only the youngest
         ones are supported by core testing. Use this if weird test errors occur. Also removes obsolete
-        image versions of typo3gmbh/phpXY.
+        image versions of ${TYPO3_DOCKER_IMAGE_BASE}XY.
 
     -v
         Enable verbose script output. Shows variables and docker commands.
@@ -120,22 +134,22 @@ Options:
         Show this help.
 
 Examples:
-    # Run unit tests using default PHP version
+    # Run unit tests using default PHP
     ./Build/Scripts/runTests.sh
 
-    # Run unit tests using PHP 8.2
-    ./Build/Scripts/runTests.sh -p 8.2
+    # Run unit tests using PHP 8.1
+    ./Build/Scripts/runTests.sh -p 8.1
 
-    # Run functional tests using PHP 8.2 and sqlite
-    ./Build/Scripts/runTests.sh -s functional -p 8.2 -d sqlite
+    # Run functional tests using sqlite
+    ./Build/Scripts/runTests.sh -s functional -d sqlite
 
-    # Run functional tests in phpunit with a filtered test method name in a specified file, php 7.4 and xdebug enabled.
-    ./Build/Scripts/runTests.sh -s functional -p 8.2 -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
+    # Run functional tests in phpunit with a filtered test method name in a specified file and xdebug enabled.
+    ./Build/Scripts/runTests.sh -s functional -x -e "--filter getLinkStatisticsFindOnlyPageBrokenLinks" Tests/Functional/LinkAnalyzerTest.php
 EOF
 
-# Test if docker-compose exists, else exit out with error
-if ! type "docker-compose" > /dev/null; then
-  echo "This script relies on docker and docker-compose. Please install" >&2
+# Test if docker exists, else exit out with error
+if ! type "docker" > /dev/null; then
+  echo "This script relies on docker. Please install" >&2
   exit 1
 fi
 
@@ -148,16 +162,33 @@ cd "$THIS_SCRIPT_DIR" || exit 1
 cd ../testing-docker || exit 1
 
 # Option defaults
-CORE_ROOT="${PWD}/../../"
-ROOT_DIR=`readlink -f ${PWD}/../../`
+if ! command -v realpath &> /dev/null; then
+  echo "This script works best with realpath installed" >&2
+  ROOT_DIR="${PWD}/../../"
+else
+  ROOT_DIR=`realpath ${PWD}/../../`
+fi
+CORE_VERSION="12.4"
 TEST_SUITE="unit"
 DBMS="mariadb"
+PHP_VERSION="8.2"
+DATABASE_DRIVER=""
+MARIADB_VERSION="10.3"
+MYSQL_VERSION="8.0"
+POSTGRES_VERSION="10"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 EXTRA_TEST_OPTIONS=""
 SCRIPT_VERBOSE=0
 CGLCHECK_DRY_RUN=""
 PASSWD_PATH=/etc/passwd
+IMAGE_PREFIX="ghcr.io/typo3/"
+DOCKER_COMPOSE_COMMAND="docker-compose"
+which docker-compose 2>/dev/null >/dev/null
+if [ $? -ne 0 ];then
+     DOCKER_COMPOSE_COMMAND="docker compose"
+fi
+
 
 # Option parsing
 # Reset in case getopts has been used previously in the shell
@@ -165,17 +196,20 @@ OPTIND=1
 # Array for invalid options
 INVALID_OPTIONS=();
 # Simple option parsing based on getopts (! not getopt)
-while getopts ":s:d:p:e:xy:huvn" OPT; do
+while getopts ":s:t:d:p:e:xy:huvn" OPT; do
     case ${OPT} in
         s)
             TEST_SUITE=${OPTARG}
+            ;;
+        t)
+            CORE_VERSION=${OPTARG}
             ;;
         d)
             DBMS=${OPTARG}
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(8.1|8.2|8.3)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(${SUPPORTED_PHP_VERSIONS})$ ]]; then
                 INVALID_OPTIONS+=("${OPT} ${OPTARG} : unsupported php version")
             fi
             ;;
@@ -221,19 +255,20 @@ if [ ${#INVALID_OPTIONS[@]} -ne 0 ]; then
     exit 1
 fi
 
+# Move "7.2" to "php72", the latter is the docker container name
 DOCKER_PHP_IMAGE=`echo "php${PHP_VERSION}" | sed -e 's/\.//'`
 
 # Set $1 to first mass argument, this is the optional test file or test directory to execute
 shift $((OPTIND - 1))
 if [ -n "${1}" ]; then
-    TEST_FILE="Web/typo3conf/ext/page_callouts/${1}"
+    TEST_FILE="../${1}"
 else
     case ${TEST_SUITE} in
         functional)
-            TEST_FILE="Web/typo3conf/ext/page_callouts/Tests/Functional"
+            TEST_FILE="../Tests/Functional"
             ;;
         unit)
-            TEST_FILE="Web/typo3conf/ext/page_callouts/Tests/Unit"
+            TEST_FILE="../Tests/Unit"
             ;;
     esac
 fi
@@ -244,29 +279,34 @@ fi
 
 # Suite execution
 case ${TEST_SUITE} in
+    composerCoreVersion)
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run composer_coreversion_require
+        SUITE_EXIT_CODE=$?
+        ;;
     composerInstall)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install
+        ${DOCKER_COMPOSE_COMMAND} run composer_install
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerInstallMax)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install_max
+        ${DOCKER_COMPOSE_COMMAND} run composer_install_max
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerInstallMin)
         setUpDockerComposeDotEnv
-        docker-compose run composer_install_min
+        ${DOCKER_COMPOSE_COMMAND} run composer_install_min
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     composerValidate)
         setUpDockerComposeDotEnv
-        docker-compose run composer_validate
+        ${DOCKER_COMPOSE_COMMAND} run composer_validate
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     cgl)
         # Active dry-run for cglAll needs not "-n" but specific options
@@ -274,23 +314,30 @@ case ${TEST_SUITE} in
             CGLCHECK_DRY_RUN="--dry-run --diff"
         fi
         setUpDockerComposeDotEnv
-        docker-compose run cgl_all
+        ${DOCKER_COMPOSE_COMMAND} run cgl_all
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
+        ;;
+    cglGit)
+        # Active dry-run for cglAll needs not "-n" but specific options
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run cgl_git
+        SUITE_EXIT_CODE=$?
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     functional)
         setUpDockerComposeDotEnv
         case ${DBMS} in
             mariadb)
-                docker-compose run functional_mariadb10
+                ${DOCKER_COMPOSE_COMMAND} run functional_mariadb
                 SUITE_EXIT_CODE=$?
                 ;;
-            mssql)
-                docker-compose run functional_mssql2019latest
+            mysql)
+                ${DOCKER_COMPOSE_COMMAND} run functional_mysql
                 SUITE_EXIT_CODE=$?
                 ;;
             postgres)
-                docker-compose run functional_postgres10
+                ${DOCKER_COMPOSE_COMMAND} run functional_postgres
                 SUITE_EXIT_CODE=$?
                 ;;
             sqlite)
@@ -299,7 +346,7 @@ case ${TEST_SUITE} in
                 # root if docker creates it. Thank you, docker. We create the path beforehand
                 # to avoid permission issues on host filesystem after execution.
                 mkdir -p "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
-                docker-compose run functional_sqlite
+                ${DOCKER_COMPOSE_COMMAND} run functional_sqlite
                 SUITE_EXIT_CODE=$?
                 ;;
             *)
@@ -308,32 +355,46 @@ case ${TEST_SUITE} in
                 echo "${HELP}" >&2
                 exit 1
         esac
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     lint)
         setUpDockerComposeDotEnv
-        docker-compose run lint
+        ${DOCKER_COMPOSE_COMMAND} run lint
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     phpstan)
         setUpDockerComposeDotEnv
-        docker-compose run phpstan
+        ${DOCKER_COMPOSE_COMMAND} run phpstan
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
+        ;;
+    phpstanGenerateBaseline)
+        setUpDockerComposeDotEnv
+        ${DOCKER_COMPOSE_COMMAND} run phpstan_generate_baseline
+        SUITE_EXIT_CODE=$?
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     unit)
         setUpDockerComposeDotEnv
-        docker-compose run unit
+        ${DOCKER_COMPOSE_COMMAND} run unit
         SUITE_EXIT_CODE=$?
-        docker-compose down
+        ${DOCKER_COMPOSE_COMMAND} down
         ;;
     update)
-        # pull typo3gmbh/phpXY:latest versions of those ones that exist locally
-        docker images typo3gmbh/php*:latest --format "{{.Repository}}:latest" | xargs -I {} docker pull {}
-        # remove "dangling" typo3gmbh/phpXY images (those tagged as <none>)
-        docker images typo3gmbh/php* --filter "dangling=true" --format "{{.ID}}" | xargs -I {} docker rmi {}
-        ;;
+       # prune unused, dangling local volumes
+       echo "> prune unused, dangling local volumes"
+       docker volume ls -q -f driver=local -f dangling=true | awk '$0 ~ /^[0-9a-f]{64}$/ { print }' | xargs -I {} docker volume rm {}
+       echo ""
+       # pull typo3/core-testing-*:latest versions of those ones that exist locally
+       echo "> pull ${IMAGE_PREFIX}core-testing-*:latest versions of those ones that exist locally"
+       docker images ${IMAGE_PREFIX}core-testing-*:latest --format "{{.Repository}}:latest" | xargs -I {} docker pull {}
+       echo ""
+       # remove "dangling" typo3/core-testing-* images (those tagged as <none>)
+       echo "> remove \"dangling\" ${IMAGE_PREFIX}core-testing-* images (those tagged as <none>)"
+       docker images ${IMAGE_PREFIX}core-testing-* --filter "dangling=true" --format "{{.ID}}" | xargs -I {} docker rmi {}
+       echo ""
+       ;;
     *)
         echo "Invalid -s option argument ${TEST_SUITE}" >&2
         echo >&2
