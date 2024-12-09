@@ -19,9 +19,11 @@ class PageLayoutListener
     protected IconFactory $iconFactory;
     protected array $extConf;
 
-    public function __construct(IconFactory $iconFactory, ExtensionConfiguration $extensionConfiguration,
-        protected Typo3Version $typo3Version)
-    {
+    public function __construct(
+        IconFactory $iconFactory,
+        ExtensionConfiguration $extensionConfiguration,
+        protected Typo3Version $typo3Version
+    ) {
         $this->iconFactory = $iconFactory;
         $this->extConf = $extensionConfiguration->get('page_callouts');
     }
